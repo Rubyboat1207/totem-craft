@@ -4,7 +4,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import totemlib.rubyboat.effects.DeezNuts;
+import totemapi.rubyboat.effects.DeezNuts;
 
 public class giveItem extends DeezNuts {
     ItemStack item;

@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import totemlib.rubyboat.effects.DeezNuts;
+import totemapi.rubyboat.effects.DeezNuts;
 
 
 public class ReplaceBlockEffect extends DeezNuts {
@@ -28,7 +28,7 @@ public class ReplaceBlockEffect extends DeezNuts {
 
     @Override
     public void onDeath(LivingEntity user, World world, ItemStack stack) {
-        Vec3d pos = user.getPos();
+        BlockPos pos = user.getBlockPos();
         BlockPos offset1 = new BlockPos(pos).add(-radius,-radius,-radius);
         BlockPos offest2 = new BlockPos(pos).add(radius,radius,radius);
         for(BlockPos pos1 : BlockPos.iterate(offset1, offest2)) {

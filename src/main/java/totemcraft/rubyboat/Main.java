@@ -1,39 +1,49 @@
 package totemcraft.rubyboat;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.Blocks;
+import net.minecraft.component.DataComponentType;
+import net.minecraft.component.type.LodestoneTrackerComponent;
+import net.minecraft.component.type.ToolComponent;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameRules;
 import totemcraft.rubyboat.effects.*;
+import totemcraft.rubyboat.itemComponents.TeleportBackComponent;
 import totemcraft.rubyboat.statusEffects.CustomStatusEffect;
 import totemcraft.rubyboat.statusEffects.SpitThrower;
-import totemlib.rubyboat.TotemItem;
-import totemlib.rubyboat.effects.*;
+import totemapi.rubyboat.TotemItem;
+import totemapi.rubyboat.effects.*;
 
 import java.util.ArrayList;
+import java.util.function.UnaryOperator;
 
 public class Main implements ModInitializer {
     public static String MOD_ID = "totemcraft";
     //StatusEffects
-    public static StatusEffect climbEffect = new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0xfcff38);
-    public static StatusEffect spitEffect = new SpitThrower(StatusEffectCategory.BENEFICIAL);
-    public static StatusEffect lavaWalker = new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0x690237);
-    public static StatusEffect waterWalker = new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0x447096);
+    public static RegistryEntry<StatusEffect> climbEffect = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "climb_effect"),new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0xfcff38));
+    public static RegistryEntry<StatusEffect> spitEffect = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "spit_effect"), new SpitThrower(StatusEffectCategory.BENEFICIAL));
+    public static RegistryEntry<StatusEffect> lavaWalker = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "lava_walker"),new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0x690237));
+    public static RegistryEntry<StatusEffect> waterWalker = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "water_walker"),new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0x447096));
+
+    public static DataComponentType<TeleportBackComponent> TELEPORT_BACK_COMPONENT = registerComponent("teleport_back", builder -> builder.codec(TeleportBackComponent.CODEC).packetCodec(TeleportBackComponent.PACKET_CODEC).cache());
+
+    private static <T> DataComponentType<T> registerComponent(String id, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
+        return Registry.register(Registries.DATA_COMPONENT_TYPE, new Identifier(MOD_ID, id), ((DataComponentType.Builder)builderOperator.apply(DataComponentType.builder())).build());
+    }
 
     //totems
     public static ArrayList<StatusEffectInstance> cowEffects = new ArrayList<>();
@@ -176,15 +186,9 @@ public class Main implements ModInitializer {
 
     public static ArrayList<StatusEffectInstance> witherskeletonEffects = new ArrayList<>();
     public static TotemItem witherskeletonTotem;
-    public static DamageSource VOID = new DamageSource(new Identifier(MOD_ID, "void").toString());
 
     @Override
     public void onInitialize() {
-        //misc registry
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(MOD_ID, "climb"), climbEffect);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(MOD_ID, "spit_thrower"), spitEffect);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(MOD_ID, "lava_walker"), Main.lavaWalker);
-        Registry.register(Registry.STATUS_EFFECT, new Identifier(MOD_ID, "water_walker"), Main.waterWalker);
 
         //totem Effects
         cowEffects.add(new StatusEffectInstance(StatusEffects.REGENERATION, 60, 0));
@@ -297,72 +301,72 @@ public class Main implements ModInitializer {
         //witch
 
         //Totem items
-        axolotlTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "axolotl_totem"), axolotlEffects, 6, null);
-        batTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "bat_totem"), batEffects, 6, new LaunchEffect(2));
-        beeTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "bee_totem"), beeEffects, 6, null);
-        blazeTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "blaze_totem"), blazeEffects, 8, null);
-        catTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "cat_totem"), catEffects, 18, null);
-        caveSpiderTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "cave_spider_totem"), caveSpiderEffects, 10, null);
-        chickenTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "chicken_totem"), chickenEffects, 2, null);
-        codTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "cod_totem"), fishEffects, 2, new giveItem(new ItemStack(Items.COOKED_COD, 1)));
-        cowTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "cow_totem"), cowEffects, 2, null);
-        creeperTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "creeper_totem"), creeperEffects, 7, new ExplodeEffect(15));
-        dolphinTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "dolphin_totem"), fishEffects, 8, null);
-        drownedTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "drowned_totem"), drownedEffects, 8, null);
-        elderGuardianTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "elder_guardian_totem"), elderGuardianEffects, 8, null);
-        endermanTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "enderman_totem"), endereffects, 8, new RandomTeleport(64));
-        endermiteTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "endermite_totem"), endereffects, 8, new teleportBackEffect(), true);
-        foxTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "fox_totem"), foxEffects, 8, new giveItem(new ItemStack(Items.SWEET_BERRIES, 16)));
-        ghastTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "ghast_totem"), ghasteffects, 20, null);
-        glowSquidTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "glow_squid_totem"), glowSquidEffects, 20, null);
-        goatTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "goat_totem"), goatEffects, 10, new LaunchEffect(1));
-        horseTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "horse_totem"), horseEffects, 10, null);
-        hoglinTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "hoglin_totem"), hoglinEffects, 10, null);
-        guardianTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "guardian_totem"), guardianEffects, 10, null);
-        huskTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "husk_totem"), huskEffects, 10, null);
-        ironGolemTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "iron_golem_totem"), ironGolemEffects, 20, null);
-        llamaTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "llama_totem"), llamaEffects, 6, null);
-        magmaCubeTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "magma_cube_totem"), magmaCubeEffects, 10, null);
-        mooshroomTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "mooshroom_totem"), mooshroomEffects, 10, null);
-        ocelotTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "ocelot_totem"), catEffects, 10, null);
-        pandaTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "panda_totem"), pandaEffects, 10, null);
-        parrotTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "parrot_totem"), chickenEffects, 10, new LaunchEffect(1));
-        phantomTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "phantom_totem"), chickenEffects, 15, new LaunchEffect(15));
-        pigTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "pig_totem"), cowEffects, 8, null);
-        piglinTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "piglin_totem"), piglinEffects, 8, null);
-        piglinBruteTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "piglin_brute_totem"), piglinBruteEffects, 16, null);
-        pillagerTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "pillager_totem"), pillagerEffects, 4, null);
-        polarBearTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "polar_bear_totem"), polarBearEffects, 4, null);
-        pufferfishTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "pufferfish_totem"), pufferfishEffects, 4, null);
-        rabbitTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "rabbit_totem"), rabbitEffects, 4, null);
-        ravagerTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "ravager_totem"), ravagerEffects, 20, null);
-        sheepTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "sheep_totem"), sheepEffects, 6, null);
-        shulkerTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "shulker_totem"), shulkerEffects, 10, null);
-        silverfishTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "silverfish_totem"), silverfishEffects, 4, null);
-        salmonTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "salmon_totem"), fishEffects, 4, null);
-        skeletonTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "skeleton_totem"), skeletonEffects, 8, null);
-        snowGolemTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "snow_golem_totem"), snowGolemEffects, 4, new FreezeEffect(50));
-        spiderTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "spider_totem"), spiderEffects, 4, new FreezeEffect(50));
-        squidTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "squid_totem"), squidEffects, 4, new AOEEffect(16, squidAOEEffects));
-        strayTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "stray_totem"), strayEffects, 4, new AOEEffect(16, new StatusEffectInstance(StatusEffects.SLOWNESS, 30*20, 2)));
-        striderTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT).fireproof(), new Identifier(MOD_ID, "strider_totem"), striderEffects, 8, null);
-        coldStriderTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT).fireproof(), new Identifier(MOD_ID, "cold_strider_totem"), coldStriderEffects, 8, null);
-        turtleTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "turtle_totem"), turtleEffects, 8, null);
-        tropicalFishTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "tropical_fish_totem"), fishEffects, 8, null);
-        vexTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "vex_totem"), vexEffects, 8, new LaunchEffect(20));
-        villagerTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "villager_totem"), villagerEffects, 16, new giveItem(new ItemStack(Items.EMERALD_BLOCK, 2)));
-        wanderingTraderTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "wandering_trader_totem"), villagerEffects, 8, new AndEffect(new giveItem(new ItemStack(Items.EMERALD_BLOCK, 2)), new RandomTeleport(16)));
-        witherTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "wither_totem"), witherEffects, 8, new AndEffect(new ExplodeEffect(10), new AOEEffect(50, new StatusEffectInstance(StatusEffects.WITHER, 15*20, 0))));
-        wolfTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "wolf_totem"), wolfEffects, 8, null);
-        zoglinTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "zoglin_totem"), zoglinEffects, 4, null);
-        zombieTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "zombie_totem"), zombieEffects, 6, null);
-        zombieVillagerTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "zombie_villager_totem"), zombieEffects, 6, new giveItem(new ItemStack(Items.EMERALD_BLOCK, 2)));
-        zombifiedPiglinTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "zombified_piglin_totem"), zombifiedPiglinEffects, 8, null);
-        playerTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "player_totem"), playerEffects, 16, null);
-        slimeTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "slime_totem"), slimeEffects, 2, new LaunchEffect(4));
-        witherskeletonTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "wither_skeleton_totem"), witherskeletonEffects, 2, null);
-        wardenTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "warden_totem"), wardenEffects, 60, new AndEffect(new ReplaceBlockEffect(Blocks.GRASS_BLOCK, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.STONE, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.DIRT, Blocks.SCULK, 5), new SculkSpreadEffect(32)))));
-        allayTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "allay_totem"), allayEffects, 10, new giveItem(new ItemStack(Items.COOKIE, 3)));
-        frogTotem = new TotemItem(new FabricItemSettings().group(ItemGroup.COMBAT), new Identifier(MOD_ID, "frog_totem"), frogEffects, 5, new LaunchEffect(3));
+        axolotlTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "axolotl_totem"), axolotlEffects, 6, null);
+        batTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "bat_totem"), batEffects, 6, new LaunchEffect(2));
+        beeTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "bee_totem"), beeEffects, 6, null);
+        blazeTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "blaze_totem"), blazeEffects, 8, null);
+        catTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "cat_totem"), catEffects, 18, null);
+        caveSpiderTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "cave_spider_totem"), caveSpiderEffects, 10, null);
+        chickenTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "chicken_totem"), chickenEffects, 2, null);
+        codTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "cod_totem"), fishEffects, 2, new giveItem(new ItemStack(Items.COOKED_COD, 1)));
+        cowTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "cow_totem"), cowEffects, 2, null);
+        creeperTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "creeper_totem"), creeperEffects, 7, new ExplodeEffect(15));
+        dolphinTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "dolphin_totem"), fishEffects, 8, null);
+        drownedTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "drowned_totem"), drownedEffects, 8, null);
+        elderGuardianTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "elder_guardian_totem"), elderGuardianEffects, 8, null);
+        endermanTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "enderman_totem"), endereffects, 8, new RandomTeleport(64));
+        endermiteTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "endermite_totem"), endereffects, 8, new teleportBackEffect(), true);
+        foxTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "fox_totem"), foxEffects, 8, new giveItem(new ItemStack(Items.SWEET_BERRIES, 16)));
+        ghastTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "ghast_totem"), ghasteffects, 20, null);
+        glowSquidTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "glow_squid_totem"), glowSquidEffects, 20, null);
+        goatTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "goat_totem"), goatEffects, 10, new LaunchEffect(1));
+        horseTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "horse_totem"), horseEffects, 10, null);
+        hoglinTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "hoglin_totem"), hoglinEffects, 10, null);
+        guardianTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "guardian_totem"), guardianEffects, 10, null);
+        huskTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "husk_totem"), huskEffects, 10, null);
+        ironGolemTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "iron_golem_totem"), ironGolemEffects, 20, null);
+        llamaTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "llama_totem"), llamaEffects, 6, null);
+        magmaCubeTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "magma_cube_totem"), magmaCubeEffects, 10, null);
+        mooshroomTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "mooshroom_totem"), mooshroomEffects, 10, null);
+        ocelotTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "ocelot_totem"), catEffects, 10, null);
+        pandaTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "panda_totem"), pandaEffects, 10, null);
+        parrotTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "parrot_totem"), chickenEffects, 10, new LaunchEffect(1));
+        phantomTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "phantom_totem"), chickenEffects, 15, new LaunchEffect(15));
+        pigTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "pig_totem"), cowEffects, 8, null);
+        piglinTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "piglin_totem"), piglinEffects, 8, null);
+        piglinBruteTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "piglin_brute_totem"), piglinBruteEffects, 16, null);
+        pillagerTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "pillager_totem"), pillagerEffects, 4, null);
+        polarBearTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "polar_bear_totem"), polarBearEffects, 4, null);
+        pufferfishTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "pufferfish_totem"), pufferfishEffects, 4, null);
+        rabbitTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "rabbit_totem"), rabbitEffects, 4, null);
+        ravagerTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "ravager_totem"), ravagerEffects, 20, null);
+        sheepTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "sheep_totem"), sheepEffects, 6, null);
+        shulkerTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "shulker_totem"), shulkerEffects, 10, null);
+        silverfishTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "silverfish_totem"), silverfishEffects, 4, null);
+        salmonTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "salmon_totem"), fishEffects, 4, null);
+        skeletonTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "skeleton_totem"), skeletonEffects, 8, null);
+        snowGolemTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "snow_golem_totem"), snowGolemEffects, 4, new FreezeEffect(50));
+        spiderTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "spider_totem"), spiderEffects, 4, new FreezeEffect(50));
+        squidTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "squid_totem"), squidEffects, 4, new AOEEffect(16, squidAOEEffects));
+        strayTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "stray_totem"), strayEffects, 4, new AOEEffect(16, new StatusEffectInstance(StatusEffects.SLOWNESS, 30*20, 2)));
+        striderTotem = new TotemItem(new Item.Settings().fireproof(), new Identifier(MOD_ID, "strider_totem"), striderEffects, 8, null);
+        coldStriderTotem = new TotemItem(new Item.Settings().fireproof(), new Identifier(MOD_ID, "cold_strider_totem"), coldStriderEffects, 8, null);
+        turtleTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "turtle_totem"), turtleEffects, 8, null);
+        tropicalFishTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "tropical_fish_totem"), fishEffects, 8, null);
+        vexTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "vex_totem"), vexEffects, 8, new LaunchEffect(20));
+        villagerTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "villager_totem"), villagerEffects, 16, new giveItem(new ItemStack(Items.EMERALD_BLOCK, 2)));
+        wanderingTraderTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "wandering_trader_totem"), villagerEffects, 8, new AndEffect(new giveItem(new ItemStack(Items.EMERALD_BLOCK, 2)), new RandomTeleport(16)));
+        witherTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "wither_totem"), witherEffects, 8, new AndEffect(new ExplodeEffect(10), new AOEEffect(50, new StatusEffectInstance(StatusEffects.WITHER, 15*20, 0))));
+        wolfTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "wolf_totem"), wolfEffects, 8, null);
+        zoglinTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "zoglin_totem"), zoglinEffects, 4, null);
+        zombieTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "zombie_totem"), zombieEffects, 6, null);
+        zombieVillagerTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "zombie_villager_totem"), zombieEffects, 6, new giveItem(new ItemStack(Items.EMERALD_BLOCK, 2)));
+        zombifiedPiglinTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "zombified_piglin_totem"), zombifiedPiglinEffects, 8, null);
+        playerTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "player_totem"), playerEffects, 16, null);
+        slimeTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "slime_totem"), slimeEffects, 2, new LaunchEffect(4));
+        witherskeletonTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "wither_skeleton_totem"), witherskeletonEffects, 2, null);
+        wardenTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "warden_totem"), wardenEffects, 60, new AndEffect(new ReplaceBlockEffect(Blocks.GRASS_BLOCK, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.STONE, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.DIRT, Blocks.SCULK, 5), new SculkSpreadEffect(32)))));
+        allayTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "allay_totem"), allayEffects, 10, new giveItem(new ItemStack(Items.COOKIE, 3)));
+        frogTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "frog_totem"), frogEffects, 5, new LaunchEffect(3));
     }
 }

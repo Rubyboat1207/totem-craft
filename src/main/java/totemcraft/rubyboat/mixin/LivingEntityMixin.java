@@ -11,16 +11,13 @@ import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.*;
 import net.minecraft.fluid.*;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -43,10 +40,10 @@ public abstract class LivingEntityMixin {
 
     @Shadow public abstract boolean addStatusEffect(StatusEffectInstance effect);
 
-    @Shadow public abstract boolean hasStatusEffect(StatusEffect effect);
-
 
     @Shadow public abstract boolean damage(DamageSource source, float amount);
+
+    @Shadow public abstract boolean hasStatusEffect(RegistryEntry<StatusEffect> effect);
 
     @Inject(at = @At("HEAD"), method = "onDeath")
     public void onDeath(DamageSource source, CallbackInfo ci)
@@ -60,7 +57,12 @@ public abstract class LivingEntityMixin {
     }
     @Inject(at = @At("HEAD"), method = "damage", cancellable = true)
     public void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if(source.isFire() && this.hasStatusEffect(Main.lavaWalker)) {
+        var fire = ((LivingEntity)(Object)this).getWorld().getDamageSources().onFire();
+
+
+
+
+        if(source == fire && this.hasStatusEffect(Main.lavaWalker)) {
             cir.setReturnValue(false);
         }
     }
@@ -163,9 +165,6 @@ public abstract class LivingEntityMixin {
     @Inject(at = @At("HEAD"), method = "isClimbing", cancellable = true)
     public void isClimbing(CallbackInfoReturnable<Boolean> cir)
     {
-        if(this.hasStatusEffect(Main.climbEffect) && ((LivingEntity)(Object)this).horizontalCollision)
-        {
-            cir.setReturnValue(true);
-        }
+        cir.setReturnValue(this.hasStatusEffect(Main.climbEffect) && ((LivingEntity) ((Object)(this))).horizontalCollision);
     }
 }
