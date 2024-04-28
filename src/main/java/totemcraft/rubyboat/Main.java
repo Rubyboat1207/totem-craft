@@ -5,15 +5,13 @@ import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentType;
-import net.minecraft.component.type.LodestoneTrackerComponent;
-import net.minecraft.component.type.ToolComponent;
-import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
@@ -38,6 +36,14 @@ public class Main implements ModInitializer {
     public static RegistryEntry<StatusEffect> spitEffect = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "spit_effect"), new SpitThrower(StatusEffectCategory.BENEFICIAL));
     public static RegistryEntry<StatusEffect> lavaWalker = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "lava_walker"),new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0x690237));
     public static RegistryEntry<StatusEffect> waterWalker = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "water_walker"),new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 0x447096));
+    public static final RegistryEntry<StatusEffect> BIG = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "big"), new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 16284963)
+            .addAttributeModifier(EntityAttributes.GENERIC_SCALE, "f95554de-cfa9-442b-ab5e-d11558fe642d", 4.0, EntityAttributeModifier.Operation.ADD_VALUE)
+            .addAttributeModifier(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, "c93ff70c-d50d-414a-beb8-d87b5d32aa5b", 4.0, EntityAttributeModifier.Operation.ADD_VALUE)
+            .addAttributeModifier(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, "f95554de-cfa9-442b-ab5e-d11558fe642d", 4.0, EntityAttributeModifier.Operation.ADD_VALUE));
+    public static final RegistryEntry<StatusEffect> SMALL = Registry.registerReference(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "small"), new CustomStatusEffect(StatusEffectCategory.BENEFICIAL, 16284963)
+            .addAttributeModifier(EntityAttributes.GENERIC_SCALE, "f95554de-cfa9-442b-ab5e-d11558fe642d", -0.75, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+            .addAttributeModifier(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, "c93ff70c-d50d-414a-beb8-d87b5d32aa5b", -0.75, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+            .addAttributeModifier(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE, "f95554de-cfa9-442b-ab5e-d11558fe642d", -0.75, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     public static DataComponentType<TeleportBackComponent> TELEPORT_BACK_COMPONENT = registerComponent("teleport_back", builder -> builder.codec(TeleportBackComponent.CODEC).packetCodec(TeleportBackComponent.PACKET_CODEC).cache());
 
@@ -154,7 +160,6 @@ public class Main implements ModInitializer {
     public static TotemItem wanderingTraderTotem;
     public static ArrayList<StatusEffectInstance> wanderingTraderEffects = new ArrayList<>();
     public static TotemItem witchTotem;
-    public static ArrayList<StatusEffectInstance> witchEffects = new ArrayList<>();
     public static TotemItem witherTotem;
     public static ArrayList<StatusEffectInstance> witherEffects = new ArrayList<>();
     public static TotemItem wolfTotem;
@@ -172,6 +177,11 @@ public class Main implements ModInitializer {
     public static ArrayList<StatusEffectInstance> allayEffects = new ArrayList<>();
     public static TotemItem frogTotem;
     public static ArrayList<StatusEffectInstance> frogEffects = new ArrayList<>();
+    public static TotemItem snifferTotem;
+    public static ArrayList<StatusEffectInstance> snifferEffects = new ArrayList<>();
+    public static TotemItem tadpoleTotem;
+    public static ArrayList<StatusEffectInstance> tadpoleEffects = new ArrayList<>();
+    public static TotemItem camelTotem;
 
 
     public static final GameRules.Key<GameRules.IntRule> TOTEM_DROP_CHANCE = GameRuleRegistry.register(
@@ -190,7 +200,9 @@ public class Main implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        //totem Effects
+
+
+        //c Effects
         cowEffects.add(new StatusEffectInstance(StatusEffects.REGENERATION, 60, 0));
         axolotlEffects.add(new StatusEffectInstance(StatusEffects.SLOWNESS, 10*20, 0));
         axolotlEffects.add(new StatusEffectInstance(StatusEffects.INVISIBILITY, 15*20, 0));
@@ -296,8 +308,9 @@ public class Main implements ModInitializer {
         allayEffects.add(new StatusEffectInstance(StatusEffects.LEVITATION, 15*20, 0));
         frogEffects.add(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 30*20, 9));
         frogEffects.add(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 40*20, 9));
-
-
+        snifferEffects.add(new StatusEffectInstance(BIG, 60*20, 0));
+        snifferEffects.add(new StatusEffectInstance(StatusEffects.STRENGTH, 60*20, 2));
+        tadpoleEffects.add(new StatusEffectInstance(SMALL, 60*20, 0));
         //witch
 
         //Totem items
@@ -368,5 +381,9 @@ public class Main implements ModInitializer {
         wardenTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "warden_totem"), wardenEffects, 60, new AndEffect(new ReplaceBlockEffect(Blocks.GRASS_BLOCK, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.STONE, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.DIRT, Blocks.SCULK, 5), new SculkSpreadEffect(32)))));
         allayTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "allay_totem"), allayEffects, 10, new giveItem(new ItemStack(Items.COOKIE, 3)));
         frogTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "frog_totem"), frogEffects, 5, new LaunchEffect(3));
+        witchTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "witch_totem"), new ArrayList<>(), 20, new GiveAllEffects(20 * 5, 0));
+        snifferTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "sniffer_totem"), snifferEffects, 20, null);
+        tadpoleTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "tadpole_totem"), tadpoleEffects, 8, null);
+        camelTotem = new TotemItem(new Item.Settings(), new Identifier(MOD_ID, "camel_totem"), new ArrayList<>(), 8, new DashForwardEffect());
     }
 }

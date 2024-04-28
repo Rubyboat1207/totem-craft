@@ -157,6 +157,7 @@ public abstract class LivingEntityMixin {
         if(ent instanceof ZombieEntity) { return new ItemStack(Main.zombieTotem, 1); }
         if(ent instanceof WitherSkeletonEntity) { return new ItemStack(Main.witherskeletonTotem, 1); }
         if(ent instanceof WanderingTraderEntity) { return new ItemStack(Main.wanderingTraderTotem, 1); }
+        if(ent instanceof WitchEntity) { return new ItemStack(Main.witchTotem, 1); }
         if(ent.isPlayer()) { return new ItemStack(Main.playerTotem, 1); }
 
         return null;
@@ -165,6 +166,8 @@ public abstract class LivingEntityMixin {
     @Inject(at = @At("HEAD"), method = "isClimbing", cancellable = true)
     public void isClimbing(CallbackInfoReturnable<Boolean> cir)
     {
-        cir.setReturnValue(this.hasStatusEffect(Main.climbEffect) && ((LivingEntity) ((Object)(this))).horizontalCollision);
+        if(this.hasStatusEffect(Main.climbEffect) && ((LivingEntity) ((Object)(this))).horizontalCollision) {
+            cir.setReturnValue(true);
+        }
     }
 }
