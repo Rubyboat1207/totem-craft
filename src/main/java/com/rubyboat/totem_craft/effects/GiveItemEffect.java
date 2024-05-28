@@ -1,14 +1,14 @@
-package totemcraft.rubyboat.effects;
+package com.rubyboat.totem_craft.effects;
 
+import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import totemapi.rubyboat.effects.DeezNuts;
 
-public class giveItem extends DeezNuts {
+public class GiveItemEffect extends TotemEffect {
     ItemStack item;
-    public giveItem(ItemStack item)
+    public GiveItemEffect(ItemStack item)
     {
         this.item = item;
     }

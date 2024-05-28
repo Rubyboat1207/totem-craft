@@ -1,4 +1,4 @@
-package totemcraft.rubyboat.statusEffects;
+package com.rubyboat.totem_craft.statusEffects;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;

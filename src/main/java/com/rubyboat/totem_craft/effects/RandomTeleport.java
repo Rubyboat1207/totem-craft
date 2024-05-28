@@ -1,5 +1,6 @@
-package totemcraft.rubyboat.effects;
+package com.rubyboat.totem_craft.effects;
 
+import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,9 +11,8 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import totemapi.rubyboat.effects.DeezNuts;
 
-public class RandomTeleport extends DeezNuts{
+public class RandomTeleport extends TotemEffect {
 
     float Radius = 16;
 

@@ -1,10 +1,8 @@
-package totemcraft.rubyboat.itemComponents;
+package com.rubyboat.totem_craft.itemComponents;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.component.Component;
-import net.minecraft.component.type.LodestoneTrackerComponent;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.math.GlobalPos;

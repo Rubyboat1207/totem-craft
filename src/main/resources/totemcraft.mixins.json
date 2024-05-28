@@ -1,14 +1,13 @@
 {
   "required": true,
-  "minVersion": "0.8",
-  "package": "totemcraft.rubyboat.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "package": "com.rubyboat.totem_craft.mixin",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AnimalMixin",
+    "BambooMixin",
     "LivingEntityMixin"
-  ],
-  "client": [
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+	}
 }

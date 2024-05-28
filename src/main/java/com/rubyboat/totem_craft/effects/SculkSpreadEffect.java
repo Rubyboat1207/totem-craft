@@ -1,15 +1,14 @@
-package totemcraft.rubyboat.effects;
+package com.rubyboat.totem_craft.effects;
 
-import net.minecraft.block.Block;
+import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.SculkSpreadManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import totemapi.rubyboat.effects.DeezNuts;
 
-public class SculkSpreadEffect extends DeezNuts {
+public class SculkSpreadEffect extends TotemEffect {
 
     int charge;
 

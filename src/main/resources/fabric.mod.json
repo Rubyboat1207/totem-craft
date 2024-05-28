@@ -1,32 +1,34 @@
 {
-  "schemaVersion": 1,
-  "id": "totemcraft",
-  "version": "${version}",
-  "name": "Totemcraft",
-  "description": "",
-  "authors": [
-    "Rubyboat1207 (Texturing + Coding)",
-    "Snapps (Texturing)"
-  ],
-  "contact": {},
-  "license": "MIT",
-  "icon": "assets/totemcraft/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "client": [
-      "totemcraft.rubyboat.client.Main"
-    ],
-    "main": [
-      "totemcraft.rubyboat.Main"
-    ]
-  },
-  "mixins": [
-    "totemcraft.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.13.2",
-    "fabric": "*",
-    "minecraft": "1.20.5",
-    "totem_api": "*"
-  }
+	"schemaVersion": 1,
+	"id": "totemcraft",
+	"version": "${version}",
+	"name": "TotemCraft",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/totemcraft/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.rubyboat.totem_craft.TotemCraft"
+		]
+	},
+	"mixins": [
+		"totemcraft.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.10",
+		"minecraft": "~1.20.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
 }

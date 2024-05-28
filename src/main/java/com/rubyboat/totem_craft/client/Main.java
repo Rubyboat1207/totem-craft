@@ -1,4 +1,4 @@
-package totemcraft.rubyboat.client;
+package com.rubyboat.totem_craft.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;

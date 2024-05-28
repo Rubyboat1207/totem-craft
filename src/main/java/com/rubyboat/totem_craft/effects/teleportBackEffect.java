@@ -1,39 +1,25 @@
-package totemcraft.rubyboat.effects;
+package com.rubyboat.totem_craft.effects;
 
-import com.mojang.serialization.DataResult;
-import net.minecraft.block.Block;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LodestoneTrackerComponent;
+import com.rubyboat.totem_craft.TotemCraft;
+import com.rubyboat.totem_craft.itemComponents.TeleportBackComponent;
+import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.explosion.Explosion;
 import org.apache.logging.log4j.Logger;
 
 import java.util.EnumSet;
-import java.util.Objects;
-import java.util.Optional;
-import totemapi.rubyboat.effects.DeezNuts;
-import totemcraft.rubyboat.Main;
-import totemcraft.rubyboat.itemComponents.TeleportBackComponent;
 
-public class teleportBackEffect extends DeezNuts{
+public class teleportBackEffect extends TotemEffect  {
     @Override
     public void onDeath(LivingEntity user, World world, ItemStack stack) {
-        TeleportBackComponent teleportBackComponent = stack.get(Main.TELEPORT_BACK_COMPONENT);
+        TeleportBackComponent teleportBackComponent = stack.get(TotemCraft.TELEPORT_BACK_COMPONENT);
         if(world.isClient) {
             return;
         }
@@ -59,7 +45,7 @@ public class teleportBackEffect extends DeezNuts{
     public ActionResult onClick(LivingEntity user, World world, BlockPos selectedBlock, ItemStack stack) {
         TeleportBackComponent teleportBackComponent = new TeleportBackComponent(GlobalPos.create(world.getRegistryKey(), user.getBlockPos()));
 
-        stack.set(Main.TELEPORT_BACK_COMPONENT, teleportBackComponent);
+        stack.set(TotemCraft.TELEPORT_BACK_COMPONENT, teleportBackComponent);
 
         if(user.isPlayer() && world.isClient)
         {

@@ -1,14 +1,13 @@
-package totemcraft.rubyboat.effects;
+package com.rubyboat.totem_craft.effects;
 
+import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.world.World;
-import totemapi.rubyboat.effects.DeezNuts;
 
-public class GiveAllEffects extends DeezNuts {
+public class GiveAllEffects extends TotemEffect {
     final int durationTicks;
     final int amplifier;
 

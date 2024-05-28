@@ -1,19 +1,14 @@
-package totemcraft.rubyboat.effects;
+package com.rubyboat.totem_craft.effects;
 
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
+import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.block.Block;
-import net.minecraft.block.entity.SculkSpreadManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import totemapi.rubyboat.effects.DeezNuts;
 
 
-public class ReplaceBlockEffect extends DeezNuts {
+public class ReplaceBlockEffect extends TotemEffect {
     Block replace;
     Block replacement;
     int radius;

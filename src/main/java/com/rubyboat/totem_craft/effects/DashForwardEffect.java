@@ -1,12 +1,12 @@
-package totemcraft.rubyboat.effects;
+package com.rubyboat.totem_craft.effects;
 
+import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
-import totemapi.rubyboat.effects.DeezNuts;
 
-public class DashForwardEffect extends DeezNuts {
+public class DashForwardEffect extends TotemEffect {
 
     @Override
     public void onDeath(LivingEntity user, World world, ItemStack stack) {

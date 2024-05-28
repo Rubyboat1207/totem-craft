@@ -66,8 +66,16 @@
   "item.totemcraft.frog_totem": "Frog Totem",
   "item.totemcraft.allay_totem": "Allay Totem",
   "item.totemcraft.phantom_totem": "Phantom Totem",
+  "item.totemcraft.sniffer_totem": "Sniffer Totem",
+  "item.totemcraft.tadpole_totem": "Tadpole Totem",
+  "item.totemcraft.witch_totem": "Witch Totem",
+  "item.totemcraft.camel_totem": "Camel Totem",
+  "item.totemcraft.armadillo_totem": "Armadillo Totem",
   "effect.totemcraft.climb": "Wall Climber",
   "effect.totemcraft.spit_thrower": "Spit Thrower",
   "effect.totemcraft.lava_walker": "Lava Walker",
-  "effect.totemcraft.water_walker": "Water Walker"
+  "effect.totemcraft.water_walker": "Water Walker",
+  "effect.totemcraft.big": "Growth",
+  "effect.totemcraft.small": "Shrinking",
+  "effect.totemcraft.verdance": "Verdance"
 }
