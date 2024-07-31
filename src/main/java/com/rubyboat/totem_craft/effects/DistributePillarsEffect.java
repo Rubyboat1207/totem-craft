@@ -1,26 +1,65 @@
 package com.rubyboat.totem_craft.effects;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.rubyboat.totem_craft.TotemCraft;
+import com.rubyboat.totemapi.components.TotemEffectType;
 import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.HashSet;
-import java.util.Set;
 
 public class DistributePillarsEffect extends TotemEffect {
-    private BlockState blockState;
-    private int radius;
-    private int pillars;
-    private int minHeight;
-    private int maxHeight;
-    private TagKey<Block> placeTag;
+    public static final MapCodec<DistributePillarsEffect> CODEC = RecordCodecBuilder.mapCodec(instance ->
+            instance.group(
+                    BlockState.CODEC.fieldOf("blockState").forGetter(DistributePillarsEffect::getBlockState),
+                    Codec.INT.fieldOf("radius").forGetter(DistributePillarsEffect::getRadius),
+                    Codec.INT.fieldOf("pillars").forGetter(DistributePillarsEffect::getPillars),
+                    Codec.INT.fieldOf("minHeight").forGetter(DistributePillarsEffect::getMinHeight),
+                    Codec.INT.fieldOf("maxHeight").forGetter(DistributePillarsEffect::getMaxHeight),
+                    TagKey.codec(Registries.BLOCK.getKey()).fieldOf("placeTag").forGetter(DistributePillarsEffect::getPlaceTag)
+            ).apply(instance, DistributePillarsEffect::new)
+    );
+
+    private final BlockState blockState;
+    private final int radius;
+    private final int pillars;
+    private final int minHeight;
+    private final int maxHeight;
+    private final TagKey<Block> placeTag;
+
+    private BlockState getBlockState() {
+        return blockState;
+    }
+
+    private int getRadius() {
+        return radius;
+    }
+
+    private int getPillars() {
+        return pillars;
+    }
+
+    private int getMinHeight() {
+        return minHeight;
+    }
+
+    private int getMaxHeight() {
+        return maxHeight;
+    }
+
+    private TagKey<Block> getPlaceTag() {
+        return placeTag;
+    }
 
     public DistributePillarsEffect(BlockState blockstate, int radius, int pillars, int minHeight, int maxHeight, TagKey<Block> placeTag) {
         this.blockState = blockstate;
@@ -62,7 +101,7 @@ public class DistributePillarsEffect extends TotemEffect {
                 }
             }
 
-            if(world.getBlockState(pos.down()).isIn(BlockTags.BAMBOO_PLANTABLE_ON)) {
+            if(world.getBlockState(pos.down()).isIn(placeTag)) {
                 int height = world.getRandom().nextBetween(minHeight, maxHeight);
 
                 if(height == 0) {
@@ -84,5 +123,10 @@ public class DistributePillarsEffect extends TotemEffect {
     @Override
     public String getTooltip() {
         return String.format("Distributes up to %d pillars of %s within a %d block radius", pillars, blockState.getBlock().getName().getString(), radius);
+    }
+
+    @Override
+    public TotemEffectType getType() {
+        return TotemCraft.DISTRIBUTE_PILLARS_EFFECT_TYPE;
     }
 }

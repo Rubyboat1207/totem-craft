@@ -25,7 +25,7 @@ public class SpitThrower extends StatusEffect {
         World world = entity.getWorld();
 
         if (!world.isClient) {
-            ArrowEntity llamaSpit = new ArrowEntity(world, entity.getX(), entity.getY() + 2, entity.getZ(), Items.ARROW.getDefaultStack());
+            ArrowEntity llamaSpit = new ArrowEntity(world, entity.getX(), entity.getY() + 2, entity.getZ(), Items.ARROW.getDefaultStack(), null);
             llamaSpit.setVelocity(entity, entity.getPitch(), entity.getYaw(), 0.0F, 1.5F, 1.0F);
             llamaSpit.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
             world.spawnEntity(llamaSpit);

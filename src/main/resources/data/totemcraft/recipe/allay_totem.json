@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FCF",
+    " F ",
+    " F "
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:wind_charge"
+    },
+    "F": {
+      "item": "totemcraft:allay_feather"
+    }
+  },
+  "result": {
+    "id": "totemcraft:allay_totem"
+  }
+}

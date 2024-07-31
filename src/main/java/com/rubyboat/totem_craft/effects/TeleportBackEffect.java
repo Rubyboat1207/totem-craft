@@ -1,7 +1,9 @@
 package com.rubyboat.totem_craft.effects;
 
+import com.mojang.serialization.MapCodec;
 import com.rubyboat.totem_craft.TotemCraft;
 import com.rubyboat.totem_craft.itemComponents.TeleportBackComponent;
+import com.rubyboat.totemapi.components.TotemEffectType;
 import com.rubyboat.totemapi.effects.TotemEffect;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,11 +14,12 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.Logger;
 
 import java.util.EnumSet;
 
-public class teleportBackEffect extends TotemEffect  {
+public class TeleportBackEffect extends TotemEffect  {
+    public static final MapCodec<TeleportBackEffect> CODEC = MapCodec.unit(TeleportBackEffect::new);
+
     @Override
     public void onDeath(LivingEntity user, World world, ItemStack stack) {
         TeleportBackComponent teleportBackComponent = stack.get(TotemCraft.TELEPORT_BACK_COMPONENT);
@@ -57,5 +60,10 @@ public class teleportBackEffect extends TotemEffect  {
     @Override
     public String getTooltip() {
         return "click a block in the overworld to return to on death";
+    }
+
+    @Override
+    public TotemEffectType getType() {
+        return TotemCraft.TELEPORT_BACK_EFFECT_TYPE;
     }
 }

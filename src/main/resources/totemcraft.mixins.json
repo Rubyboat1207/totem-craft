@@ -3,9 +3,13 @@
   "package": "com.rubyboat.totem_craft.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AllayDisappearMixin",
+    "AllayFeatherMixin",
     "AnimalMixin",
     "BambooMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "ModEntityDataSaverMixin",
+    "TestMixin"
   ],
   "injectors": {
     "defaultRequire": 1
