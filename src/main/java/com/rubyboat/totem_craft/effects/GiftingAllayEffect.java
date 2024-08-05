@@ -23,6 +23,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -30,12 +31,12 @@ import java.util.Optional;
 
 public class GiftingAllayEffect extends TotemEffect {
     public static MapCodec<GiftingAllayEffect> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.either(ItemStack.CODEC, RegistryKey.createCodec(RegistryKeys.LOOT_TABLE)).fieldOf("item").forGetter(GiftingAllayEffect::getItemOrLootTable)
+            Codec.either(ItemStack.CODEC, Identifier.CODEC).fieldOf("item").forGetter(GiftingAllayEffect::getItemOrLootTable)
     ).apply(instance, GiftingAllayEffect::new));
     private final Optional<ItemStack> item;
-    private final Optional<RegistryKey<LootTable>> lootTableKey;
+    private final Optional<Identifier> lootTableKey;
 
-    private Either<ItemStack, RegistryKey<LootTable>> getItemOrLootTable() {
+    private Either<ItemStack, Identifier> getItemOrLootTable() {
         if(item.isPresent()) {
             return Either.left(item.get());
         }
@@ -52,10 +53,10 @@ public class GiftingAllayEffect extends TotemEffect {
 
     public GiftingAllayEffect(RegistryKey<LootTable> lootTable) {
         this.item = Optional.empty();
-        this.lootTableKey = Optional.of(lootTable);
+        this.lootTableKey = Optional.of(lootTable.getValue());
     }
 
-    private GiftingAllayEffect(Either<ItemStack, RegistryKey<LootTable>> item) {
+    private GiftingAllayEffect(Either<ItemStack, Identifier> item) {
         this.item = item.left();
         this.lootTableKey = item.right();
     }
@@ -65,7 +66,7 @@ public class GiftingAllayEffect extends TotemEffect {
             return item.get().copy();
         }
         if(lootTableKey.isPresent()) {
-            LootTable lootTable = world.getServer().getReloadableRegistries().getLootTable(lootTableKey.get());
+            LootTable lootTable = world.getServer().getReloadableRegistries().getLootTable(RegistryKey.of(RegistryKeys.LOOT_TABLE, lootTableKey.get()));
 
             LootContextParameterSet lootContextParameterSet = new LootContextParameterSet.Builder(world).luck(player.getLuck()).build(LootContextTypes.EMPTY);
 

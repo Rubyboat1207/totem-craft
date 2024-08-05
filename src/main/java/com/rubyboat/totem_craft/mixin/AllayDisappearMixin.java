@@ -16,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.UUID;
+
 @Mixin(AllayEntity.class)
 public abstract class AllayDisappearMixin extends LivingEntity {
 
@@ -29,7 +31,13 @@ public abstract class AllayDisappearMixin extends LivingEntity {
     boolean gavebrain = false;
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo ci) {
-        if(((TCDataContainer)this).world_border$getPersistentData().getBoolean("disappear")) {
+        var data = ((TCDataContainer)this).world_border$getPersistentData();
+        var allay = (AllayEntity)(Object)this;
+        if(data.getBoolean("disappear")) {
+            var player = allay.getWorld().getPlayerByUuid(UUID.fromString(data.getString("gift_player")));
+            if(player == null || player.isDead()) {
+                this.remove(RemovalReason.DISCARDED);
+            }
             if(!gavebrain) {
                 this.brain = GiveAllayBrain.create(this.getBrain());
                 gavebrain = true;

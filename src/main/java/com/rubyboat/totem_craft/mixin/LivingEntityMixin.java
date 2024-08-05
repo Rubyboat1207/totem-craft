@@ -10,13 +10,16 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -44,13 +47,30 @@ public abstract class LivingEntityMixin {
     @Shadow public abstract boolean hasStatusEffect(RegistryEntry<StatusEffect> effect);
 
 
+    @Shadow private @Nullable LivingEntity attacker;
+
     @Inject(at = @At("HEAD"), method = "onDeath")
     public void onDeath(DamageSource source, CallbackInfo ci)
     {
-        if(!((LivingEntity)(Object)this).getWorld().isClient){
-            ServerWorld sw = (ServerWorld) ((LivingEntity)(Object)this).getWorld();
+        var entity = (LivingEntity)(Object)this;
+
+        if(!entity.getWorld().isClient){
+            ServerWorld sw = (ServerWorld) entity.getWorld();
+
+            var attacker = entity.getAttacker();
+
+            if(attacker == null) {
+                return;
+            }
+            if(!(attacker instanceof PlayerEntity)) {
+                return;
+            }
+            if(attacker.getMainHandStack().getItem() != Items.GOLDEN_SWORD && attacker.getMainHandStack().getItem() != Items.GOLDEN_AXE) {
+                return;
+            }
+
             if(new Random().nextInt(0, 100) < sw.getGameRules().getInt(TotemCraft.TOTEM_DROP_CHANCE)) {
-                TotemCraft.SpawnItemAtEntity(((LivingEntity)(Object)this), TotemCraft.GetTotemFromEntity(((LivingEntity)(Object)this)));
+                TotemCraft.SpawnItemAtEntity(entity, TotemCraft.GetTotemFromEntity(entity));
             }
         }
     }

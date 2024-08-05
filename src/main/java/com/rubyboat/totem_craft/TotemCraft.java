@@ -205,6 +205,7 @@ public class TotemCraft implements ModInitializer {
 	public static TotemItem armadilloTotem;
 
 	public static Item allayFeatherItem = new Item(new Item.Settings().maxCount(16));
+	public static Item mysteryItem = new Item(new Item.Settings());
 
 	public static final TotemEffectType DASH_FORWARD_EFFECT_TYPE = new TotemEffectType(DashForwardEffect.CODEC);
 	public static final TotemEffectType DISTRIBUTE_PILLARS_EFFECT_TYPE = new TotemEffectType(DistributePillarsEffect.CODEC);
@@ -217,6 +218,7 @@ public class TotemCraft implements ModInitializer {
 	public static final TotemEffectType TELEPORT_BACK_EFFECT_TYPE = new TotemEffectType(TeleportBackEffect.CODEC);
 	public static final TotemEffectType RANDOM_TELEPORT_WITH_PARTICLES = new TotemEffectType(RandomTeleportEffect.CODEC);
 	public static final TotemEffectType GIFTING_ALLAY_EFFECT_TYPE = new TotemEffectType(GiftingAllayEffect.CODEC);
+	public static final TotemEffectType LAUNCH_BACK_EFFECT_TYPE = new TotemEffectType(LaunchBackEffect.CODEC);
 
 	public static final GameRules.Key<GameRules.IntRule> TOTEM_DROP_CHANCE = GameRuleRegistry.register(
 			"totemDropChance",
@@ -339,7 +341,8 @@ public class TotemCraft implements ModInitializer {
 		wardenEffects.add(new StatusEffectInstance(StatusEffects.DARKNESS, 60*20, 0));
 		wardenEffects.add(new StatusEffectInstance(StatusEffects.HEALTH_BOOST, 3*60*20, 4));
 		wardenEffects.add(new StatusEffectInstance(StatusEffects.REGENERATION, 3*60*20, 3));
-		allayEffects.add(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 15*20, 0));
+		allayEffects.add(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 30*20, 1));
+		allayEffects.add(new StatusEffectInstance(StatusEffects.SPEED, 30*20, 1));
 		frogEffects.add(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 30*20, 9));
 		frogEffects.add(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 40*20, 9));
 		snifferEffects.add(new StatusEffectInstance(BIG, 60*20, 0));
@@ -414,7 +417,7 @@ public class TotemCraft implements ModInitializer {
 		slimeTotem = new TotemItem(new Item.Settings(), identifierOf( "slime_totem"), slimeEffects, 2, new LaunchEffect(4));
 		witherskeletonTotem = new TotemItem(new Item.Settings(), identifierOf( "wither_skeleton_totem"), witherskeletonEffects, 2, null);
 		wardenTotem = new TotemItem(new Item.Settings(), identifierOf( "warden_totem"), wardenEffects, 60, new AndEffect(new ReplaceBlockEffect(Blocks.GRASS_BLOCK, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.STONE, Blocks.SCULK, 5), new AndEffect(new ReplaceBlockEffect(Blocks.DIRT, Blocks.SCULK, 5), new SculkSpreadEffect(32)))));
-		allayTotem = new TotemItem(new Item.Settings(), identifierOf( "allay_totem"), allayEffects, 10, new GiftingAllayEffect(ALLAY_TOTEM_LOOT_TABLE));
+		allayTotem = new TotemItem(new Item.Settings(), identifierOf( "allay_totem"), allayEffects, 10, new AndEffect(new GiftingAllayEffect(ALLAY_TOTEM_LOOT_TABLE), new LaunchBackEffect(3f)));
 		frogTotem = new TotemItem(new Item.Settings(), identifierOf( "frog_totem"), frogEffects, 5, new LaunchEffect(3));
 		witchTotem = new TotemItem(new Item.Settings(), identifierOf( "witch_totem"), new ArrayList<>(), 20, new GiveAllEffects(20 * 5, 0));
 		snifferTotem = new TotemItem(new Item.Settings(), identifierOf( "sniffer_totem"), snifferEffects, 20, null);
@@ -423,6 +426,7 @@ public class TotemCraft implements ModInitializer {
 		armadilloTotem = new TotemItem(new Item.Settings(), identifierOf( "armadillo_totem"), armadilloEffects, 20, null);
 
 		Registry.register(Registries.ITEM, identifierOf( "allay_feather"), allayFeatherItem);
+		Registry.register(Registries.ITEM, identifierOf( "mystery_item"), mysteryItem);
 
 
 		Registry.register(TotemComponent.EFFECTS, identifierOf( "dash_forward"), DASH_FORWARD_EFFECT_TYPE);
@@ -436,6 +440,7 @@ public class TotemCraft implements ModInitializer {
 		Registry.register(TotemComponent.EFFECTS, identifierOf( "teleport_back"), TELEPORT_BACK_EFFECT_TYPE);
 		Registry.register(TotemComponent.EFFECTS, identifierOf( "random_teleport_with_particles"), RANDOM_TELEPORT_WITH_PARTICLES);
 		Registry.register(TotemComponent.EFFECTS, identifierOf( "gift_allay"), GIFTING_ALLAY_EFFECT_TYPE);
+		Registry.register(TotemComponent.EFFECTS, identifierOf( "launch_back"), LAUNCH_BACK_EFFECT_TYPE);
 	}
 
 	public static ItemStack GetTotemFromEntity(Entity ent)
